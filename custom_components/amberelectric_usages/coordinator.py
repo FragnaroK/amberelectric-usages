@@ -163,6 +163,8 @@ class AmberUsagesCoordinator(DataUpdateCoordinator):
                 last_stat_start = datetime.fromtimestamp(
                     last_stat["start"], timezone.utc
                 )
+            if channel == "B1":
+                last_stat_sum = -last_stat_sum
 
             statistics: list[StatisticData] = []
             for start_hour, usages in sorted(usages_by_hour.items()):
@@ -176,9 +178,10 @@ class AmberUsagesCoordinator(DataUpdateCoordinator):
 
                 last_stat_sum += total_cost
 
-                statistics.append(
-                    StatisticData(state=total_cost, sum=last_stat_sum, start=start_hour)
-                )
+                if channel == "B1":
+                    statistics.append(StatisticData(state=-total_cost, sum=-last_stat_sum, start=start_hour))
+                else:
+                    statistics.append(StatisticData(state=total_cost, sum=last_stat_sum, start=start_hour))
 
                 if self.lastest_time is None or self.lastest_time < start_hour:
                     self.lastest_time = start_hour
