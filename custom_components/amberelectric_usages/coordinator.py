@@ -118,8 +118,9 @@ class AmberUsagesCoordinator(DataUpdateCoordinator):
             last_stat_start: datetime = None
             
             # get_last_statistics is already an async-safe DB query. Do not wrap in executor job.
-            last_stats = await get_last_statistics(self._hass, 1, statistic_id, True, {"sum"})
-            
+            last_stats = await self._hass.async_add_executor_job(
+                    get_last_statistics, self._hass, 1, statistic_id, True, {"sum"}
+                )
             if last_stats and statistic_id in last_stats:
                 last_stat = last_stats[statistic_id][0]
                 last_stat_sum = last_stat["sum"] or 0
@@ -166,8 +167,9 @@ class AmberUsagesCoordinator(DataUpdateCoordinator):
             last_stat_start: datetime = None
             
             # Natively async API called directly
-            last_stats = await get_last_statistics(self._hass, 1, statistic_id, True, {"sum"})
-            
+            last_stats = await self._hass.async_add_executor_job(
+                get_last_statistics, self._hass, 1, statistic_id, True, {"sum"}
+            )
             if last_stats and statistic_id in last_stats:
                 last_stat = last_stats[statistic_id][0]
                 last_stat_sum = last_stat["sum"] or 0
